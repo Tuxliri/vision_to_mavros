@@ -1,0 +1,17 @@
+standalone_tags:
+  [
+  ]
+
+tag_bundles:
+  [
+    {
+      name: "duckiematrix_tags",
+      layout:
+        [
+          {id: 300, size: 0.08, x: 0.0,  y: 0.0,  z: 0.0, qw: 1.0},
+          {id: 301, size: 0.08, x: 0.50, y: 0.0,  z: 0.0, qw: 1.0},
+          {id: 302, size: 0.08, x: 0.50, y: 0.50, z: 0.0, qw: 1.0},
+          {id: 303, size: 0.08, x: 0.0,  y: 0.50, z: 0.0, qw: 1.0}
+        ]
+    }
+  ]
