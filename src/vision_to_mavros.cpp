@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "vision_to_mavros");
 
-  ros::NodeHandle node;
+  ros::NodeHandle node("~");
   
   //////////////////////////////////////////////////
   // Variables for precision navigation
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 
   nav_msgs::Path body_path;
 
-  std::string target_frame_id = "/camera_odom_frame";
+  std::string target_frame_id = "/camera_frame";
 
   std::string source_frame_id = "/camera_link";
 
