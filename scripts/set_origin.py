@@ -1,113 +1,52 @@
-#!/usr/bin/env python
-
-##
-#
-# Send SET_GPS_GLOBAL_ORIGIN and SET_HOME_POSITION messages
-#
-##
+#!/usr/bin/env python3
 
 import rospy
-from pymavlink.dialects.v10 import ardupilotmega as MAV_APM
-from mavros.mavlink import convert_to_rosmsg
 from mavros_msgs.msg import Mavlink
+from pymavlink.dialects.v20 import ardupilotmega as MAV_APM
+from mavros.mavlink import convert_to_rosmsg
 
-# Global position of the origin
-lat = 425633500  # Terni
-lon = 126432900  # Terni
-alt = 163000 
+import os
 
-class fifo(object):
-    """ A simple buffer """
-    def __init__(self):
-        self.buf = []
-    def write(self, data):
-        self.buf += data
-        return len(data)
-    def read(self):
-        return self.buf.pop(0)
+os.environ["MAVLINK20"] = "1"
 
-def send_message(msg, mav, pub):
-    """
-    Send a mavlink message
-    """
-    msg.pack(mav)
-    rosmsg = convert_to_rosmsg(msg)
-    pub.publish(rosmsg)
+VEHICLE_NAME = os.environ.get("VEHICLE_NAME", "duckiedrone")
 
-    print("sent message %s" % msg)
 
-def set_global_origin(mav, pub):
-    """
-    Send a mavlink SET_GPS_GLOBAL_ORIGIN message, which allows us
-    to use local position information without a GPS.
-    """
-    target_system = mav.srcSystem
-    #target_system = 0   # 0 --> broadcast to everyone
-    lattitude = lat
-    longitude = lon
-    altitude = alt
+def send_set_gps_global_origin():
+    rospy.init_node("set_gps_global_origin")
 
+    topic_name = f"/{VEHICLE_NAME}/mavlink/to"
+    mavlink_pub = rospy.Publisher(topic_name, Mavlink, queue_size=10)
+
+    rospy.loginfo(f"Publishing to topic: {topic_name}")
+
+    rospy.sleep(1)  # Ensure the publisher is connected
+
+    lat = 425633500  # Example latitude in degrees * 1E7
+    lon = 126432900  # Example longitude in degrees * 1E7
+    alt = 163000  # Altitude in mm
+
+    # Create MAVLink message
     msg = MAV_APM.MAVLink_set_gps_global_origin_message(
-            target_system,
-            lattitude, 
-            longitude,
-            altitude)
+        target_system=1,  # Set to 1 (or 0 for broadcast)
+        latitude=lat,
+        longitude=lon,
+        altitude=alt,
+    )
+    # **Explicitly Pack the Message**
+    mav = MAV_APM.MAVLink(None, srcSystem=1)
+    msg.pack(mav)  # Pack the message before converting
 
-    send_message(msg, mav, pub)
+    # Convert MAVLink message to ROS format
+    ros_msg = convert_to_rosmsg(msg)
 
-def set_home_position(mav, pub):
-    """
-    Send a mavlink SET_HOME_POSITION message, which should allow
-    us to use local position information without a GPS
-    """
-    target_system = mav.srcSystem
-    #target_system = 0  # broadcast to everyone
+    rospy.loginfo("Sending SET_GPS_GLOBAL_ORIGIN message to ")
+    mavlink_pub.publish(ros_msg)
+    rospy.sleep(1)
 
-    lattitude = lat
-    longitude = lon
-    altitude = alt
-    
-    x = 0
-    y = 0
-    z = 0
-    q = [1, 0, 0, 0]   # w x y z
 
-    approach_x = 0
-    approach_y = 0
-    approach_z = 1
-
-    msg = MAV_APM.MAVLink_set_home_position_message(
-            target_system,
-            lattitude,
-            longitude,
-            altitude,
-            x,
-            y,
-            z,
-            q,
-            approach_x,
-            approach_y,
-            approach_z)
-
-    send_message(msg, mav, pub)
-
-if __name__=="__main__":
+if __name__ == "__main__":
     try:
-        rospy.init_node("origin_publisher")
-        mavlink_pub = rospy.Publisher("/mavlink/to", Mavlink, queue_size=20)
-
-        # Set up mavlink instance
-        f = fifo()
-        mav = MAV_APM.MAVLink(f, srcSystem=1, srcComponent=1)
-
-        # wait to initialize
-        while mavlink_pub.get_num_connections() <= 0:
-            pass
-   
-        for _ in range(2):
-            rospy.sleep(1)
-            set_global_origin(mav, mavlink_pub)
-            set_home_position(mav, mavlink_pub)
+        send_set_gps_global_origin()
     except rospy.ROSInterruptException:
         pass
-
