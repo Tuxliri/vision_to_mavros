@@ -3,7 +3,7 @@ import rospy
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseStamped, TwistWithCovarianceStamped
 
-VEHICLE_NAME = 'virtualendeavour'
+VEHICLE_NAME = 'endeavour'
 
 def odom_callback(odom_msg):
     # Publish pose

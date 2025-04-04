@@ -9,10 +9,10 @@ import math
 def publish_circular_trajectory(vehicle_name):
     rospy.init_node('circular_trajectory_publisher', anonymous=True)
     pub = rospy.Publisher(f"/{vehicle_name}/duckiematrix_interface_node/state", Odometry, queue_size=10)
-    rate = rospy.Rate(50)  # 10 Hz
+    rate = rospy.Rate(hz=50)
 
     radius = 10.0  # radius of the circle
-    angular_velocity = 0.3  # angular velocity in radians per second
+    angular_velocity = 0.03  # angular velocity in radians per second
     current_time = rospy.Time.now()
 
     while not rospy.is_shutdown():
