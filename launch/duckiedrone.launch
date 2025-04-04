@@ -6,7 +6,7 @@
     <arg name="camera_namespace" default="/$(arg veh)/camera_node"/>
     <arg name="input_image_topic" default="/$(arg veh)/camera_node/image"/>
     <arg name="output_image_topic" default="$(arg input_image_topic)/image_raw"/>
-    <arg name="camera_info_topic" default="/$(arg veh)/camera_node/camera_info"/> # TODO: this is hacky
+    <arg name="camera_info_topic" default="/$(arg veh)/camera_node/camera_info"/> # TODO: this remapping is hacky
 
     <!-- This node provides image rectification -->
     <node name="image_proc" pkg="image_proc" type="image_proc" ns="$(arg veh)/camera_node"/>
@@ -15,9 +15,6 @@
     <arg name="launch_prefix" default="" />
     <arg name="node_namespace" default="apriltag_ros_continuous_node" />
     <arg name="camera_frame" default="camera_frame" />
-    <arg name="camera_roll" default="$(eval 0*3.1415/180)" />
-    <arg name="camera_pitch" default="$(eval (90-45)*3.1415/180)" />
-    <arg name="camera_yaw" default="$(eval 180*3.1415/180)" />
 
     <!-- 1) Put apriltag_ros 'settings.yaml' and your '$(arg tag_name).yaml' in the same apriltag_ros namespace -->
     <rosparam command="load" file="$(find apriltag_ros)/config/settings.yaml" ns="$(arg node_namespace)" />
@@ -35,16 +32,26 @@
     <!-- 3) The vision_to_mavros node with its own name and parameters. -->
     <node pkg="vision_to_mavros" type="vision_to_mavros_node" name="vision_to_mavros" output="screen">
 
-        <!-- These go in *this* node’s namespace -->
-        <param name="target_frame_id"  value="$(arg tag_name)" />
-        <param name="source_frame_id"  value="top_down_frame" />
-        <param name="output_rate"      value="30" />
-
+        <!-- i.e. the "world" frame -->
+        <param name="target_frame_id"  value="apriltag_grid" />
+        <!-- i.e. the "body" frame -->
+        <param name="source_frame_id"  value="$(arg camera_frame)" /> 
+        <param name="output_rate"      value="15" />
+        <param name="yaw_cam"      value="1.57" />
+        <param name="pitch_cam"      value="0" />
+        <param name="roll_cam"      value="3.14" />
+        <param name="gamma_world"      value="1.57" />
+        
+        <!-- vision_pose expects an enu pose according to  -->
         <remap from="~vision_pose" to="/$(arg veh)/mavros/vision_pose/pose" />
     </node>
 
+    <!-- <arg name="camera_roll" default="$(eval 0*3.1415/180)" /> -->
+    <!-- <arg name="camera_pitch" default="$(eval (90-45)*3.1415/180)" /> -->
+    <!-- <arg name="camera_yaw" default="$(eval 180*3.1415/180)" /> -->
+
     <!-- Static transform publisher to express detections in the camera frame in a top-down frame -->
-    <node pkg="tf2_ros" type="static_transform_publisher" name="static_tf_camera"
-    args="0 0 0 $(arg camera_yaw) $(arg camera_pitch) $(arg camera_roll) top_down_frame camera_frame" />
+    <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="static_tf_camera" -->
+    <!-- args="0 0 0 $(arg camera_yaw) $(arg camera_pitch) $(arg camera_roll) top_down_frame camera_frame" /> -->
 
 </launch>
