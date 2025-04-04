@@ -22,6 +22,8 @@ int main(int argc, char** argv)
   ros::Publisher body_path_pubisher = node.advertise<nav_msgs::Path>("body_frame/path", 1);
 
   tf::TransformListener tf_listener;
+  tf::TransformBroadcaster tf_broadcaster;
+  tf::Transform tf_body;
 
   tf::StampedTransform transform;
 
@@ -227,6 +229,10 @@ int main(int argc, char** argv)
         body_path.header.frame_id = msg_body_pose.header.frame_id;
         body_path.poses.push_back(msg_body_pose);
         body_path_pubisher.publish(body_path);
+
+        tf_body.setOrigin(position_body);
+        tf_body.setRotation(quat_body);
+        tf_broadcaster.sendTransform(tf::StampedTransform(tf_body, transform.stamp_, transform.frame_id_, "body_frame"));
       }
     }
     catch (tf::TransformException ex)
