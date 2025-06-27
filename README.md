@@ -12,6 +12,30 @@ Follow this wiki page: https://ardupilot.org/dev/docs/ros-vio-tracking-camera.ht
 Follow this wiki page: https://ardupilot.org/copter/docs/common-vio-tracking-camera.html
 
 --------------------------------------------------------------------------
+# Building with colcon
+
+Assuming this repository is inside the `src` folder of a ROS&nbsp;2
+workspace (for example `~/ros2_ws/src`), build it using
+
+```bash
+cd ~/ros2_ws
+colcon build
+```
+
+After the build completes, source the workspace so that the executables
+are added to your environment
+
+```bash
+source install/setup.bash
+```
+
+You can then run the C++ executable `vision_to_mavros_node` with
+
+```bash
+ros2 run vision_to_mavros vision_to_mavros_node
+```
+
+--------------------------------------------------------------------------
 # What's included (the main stuffs):
 
 ## ROS nodes:
