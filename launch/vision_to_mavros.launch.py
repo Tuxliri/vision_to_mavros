@@ -28,22 +28,22 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'output_rate',
-            default_value='30',
+            default_value='30.0',
             description='Publishing rate in Hz'
         ),
         DeclareLaunchArgument(
             'roll_cam',
-            default_value='0',
+            default_value='0.0',
             description='Roll angle of the camera frame'
         ),
         DeclareLaunchArgument(
             'pitch_cam',
-            default_value='0',
+            default_value='0.0',
             description='Pitch angle of the camera frame'
         ),
         DeclareLaunchArgument(
             'yaw_cam',
-            default_value='0',
+            default_value='0.0',
             description='Yaw angle of the camera frame'
         ),
         DeclareLaunchArgument(
