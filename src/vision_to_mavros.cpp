@@ -19,8 +19,8 @@ int main(int argc, char ** argv)
   auto node = std::make_shared<rclcpp::Node>("vision_to_mavros");
 
   // Parameters
-  std::string target_frame_id = node->declare_parameter<std::string>("target_frame_id", "/camera_frame");
-  std::string source_frame_id = node->declare_parameter<std::string>("source_frame_id", "/camera_link");
+  std::string target_frame_id = node->declare_parameter<std::string>("target_frame_id", "camera_frame");
+  std::string source_frame_id = node->declare_parameter<std::string>("source_frame_id", "camera_link");
   double output_rate = node->declare_parameter<double>("output_rate", 20.0);
   double roll_cam = node->declare_parameter<double>("roll_cam", 0.0);
   double pitch_cam = node->declare_parameter<double>("pitch_cam", 0.0);
@@ -28,8 +28,8 @@ int main(int argc, char ** argv)
   double gamma_world = node->declare_parameter<double>("gamma_world", -1.5707963);
 
   bool enable_precland = node->declare_parameter<bool>("enable_precland", false);
-  std::string precland_target_frame_id = node->declare_parameter<std::string>("precland_target_frame_id", "/landing_target");
-  std::string precland_camera_frame_id = node->declare_parameter<std::string>("precland_camera_frame_id", "/camera_fisheye2_optical_frame");
+  std::string precland_target_frame_id = node->declare_parameter<std::string>("precland_target_frame_id", "landing_target");
+  std::string precland_camera_frame_id = node->declare_parameter<std::string>("precland_camera_frame_id", "camera_fisheye2_optical_frame");
 
   auto camera_pose_publisher = node->create_publisher<geometry_msgs::msg::PoseStamped>("vision_pose", 10);
   auto body_path_pubisher = node->create_publisher<nav_msgs::msg::Path>("body_frame/path", 1);
