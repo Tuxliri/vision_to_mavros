@@ -18,12 +18,12 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             'target_frame_id',
-            default_value='/camera_odom_frame',
+            default_value='camera_odom_frame',
             description='Target frame id (world frame)'
         ),
         DeclareLaunchArgument(
             'source_frame_id',
-            default_value='/camera_link',
+            default_value='camera_link',
             description='Source frame id (camera frame)'
         ),
         DeclareLaunchArgument(
