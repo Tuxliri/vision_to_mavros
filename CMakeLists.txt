@@ -177,6 +177,11 @@ install(DIRECTORY
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
+install(FILES
+  launch/vision_to_mavros.launch.py
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
 #   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
