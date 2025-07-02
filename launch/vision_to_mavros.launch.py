@@ -14,8 +14,14 @@ def generate_launch_description():
     pitch_cam = LaunchConfiguration('pitch_cam')
     yaw_cam = LaunchConfiguration('yaw_cam')
     gamma_world = LaunchConfiguration('gamma_world')
+    use_sim_time = LaunchConfiguration('use_sim_time')
 
     return LaunchDescription([
+        DeclareLaunchArgument(
+            'use_sim_time',
+            default_value='true',
+            description='Use simulation clock'
+        ),
         DeclareLaunchArgument(
             'target_frame_id',
             default_value='camera_odom_frame',
@@ -63,7 +69,8 @@ def generate_launch_description():
                 'roll_cam': roll_cam,
                 'pitch_cam': pitch_cam,
                 'yaw_cam': yaw_cam,
-                'gamma_world': gamma_world
+                'gamma_world': gamma_world,
+                'use_sim_time': use_sim_time
             }],
             remappings=[('vision_pose', '/mavros/vision_pose/pose')]
         )
