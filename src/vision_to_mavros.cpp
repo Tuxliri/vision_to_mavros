@@ -70,12 +70,14 @@ int main(int argc, char ** argv)
                                  transform.transform.rotation.y,
                                  transform.transform.rotation.z,
                                  transform.transform.rotation.w);
-        tf2::Quaternion quat_cam_to_body_x, quat_cam_to_body_y, quat_cam_to_body_z, quat_rot_z, quat_body;
-        quat_cam_to_body_x.setRPY(roll_cam, 0, 0);
-        quat_cam_to_body_y.setRPY(0, pitch_cam, 0);
-        quat_cam_to_body_z.setRPY(0, 0, yaw_cam);
+        tf2::Quaternion quat_cam_to_body, quat_rot_z, quat_body;
+
+        // camera → body (intrinsic R-P-Y = X-Y-Z)
+        quat_cam_to_body.setRPY(roll_cam, pitch_cam, yaw_cam);
+        // world-frame Z correction
         quat_rot_z.setRPY(0, 0, -gamma_world);
-        quat_body = quat_rot_z * quat_cam * quat_cam_to_body_x * quat_cam_to_body_y * quat_cam_to_body_z;
+        // final orientation of the body frame, expressed in <target_frame_id>
+        quat_body = quat_rot_z * quat_cam * quat_cam_to_body;
         quat_body.normalize();
 
         msg_body_pose.header.stamp = transform.header.stamp;
