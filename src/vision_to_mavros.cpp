@@ -8,6 +8,7 @@
 #include <mavros_msgs/msg/landing_target.hpp>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/transform_broadcaster.h>
+#include <tf2_ros/buffer.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Vector3.h>
 #include <geometry_msgs/msg/transform_stamped.hpp>
@@ -18,8 +19,8 @@ int main(int argc, char ** argv)
   auto node = std::make_shared<rclcpp::Node>("vision_to_mavros");
 
   // Parameters
-  std::string target_frame_id = node->declare_parameter<std::string>("target_frame_id", "/camera_frame");
-  std::string source_frame_id = node->declare_parameter<std::string>("source_frame_id", "/camera_link");
+  std::string target_frame_id = node->declare_parameter<std::string>("target_frame_id", "camera_frame");
+  std::string source_frame_id = node->declare_parameter<std::string>("source_frame_id", "camera_link");
   double output_rate = node->declare_parameter<double>("output_rate", 20.0);
   double roll_cam = node->declare_parameter<double>("roll_cam", 0.0);
   double pitch_cam = node->declare_parameter<double>("pitch_cam", 0.0);
@@ -27,8 +28,8 @@ int main(int argc, char ** argv)
   double gamma_world = node->declare_parameter<double>("gamma_world", -1.5707963);
 
   bool enable_precland = node->declare_parameter<bool>("enable_precland", false);
-  std::string precland_target_frame_id = node->declare_parameter<std::string>("precland_target_frame_id", "/landing_target");
-  std::string precland_camera_frame_id = node->declare_parameter<std::string>("precland_camera_frame_id", "/camera_fisheye2_optical_frame");
+  std::string precland_target_frame_id = node->declare_parameter<std::string>("precland_target_frame_id", "landing_target");
+  std::string precland_camera_frame_id = node->declare_parameter<std::string>("precland_camera_frame_id", "camera_fisheye2_optical_frame");
 
   auto camera_pose_publisher = node->create_publisher<geometry_msgs::msg::PoseStamped>("vision_pose", 10);
   auto body_path_pubisher = node->create_publisher<nav_msgs::msg::Path>("body_frame/path", 1);
@@ -69,12 +70,14 @@ int main(int argc, char ** argv)
                                  transform.transform.rotation.y,
                                  transform.transform.rotation.z,
                                  transform.transform.rotation.w);
-        tf2::Quaternion quat_cam_to_body_x, quat_cam_to_body_y, quat_cam_to_body_z, quat_rot_z, quat_body;
-        quat_cam_to_body_x.setRPY(roll_cam, 0, 0);
-        quat_cam_to_body_y.setRPY(0, pitch_cam, 0);
-        quat_cam_to_body_z.setRPY(0, 0, yaw_cam);
+        tf2::Quaternion quat_cam_to_body, quat_rot_z, quat_body;
+
+        // camera → body (intrinsic R-P-Y = X-Y-Z)
+        quat_cam_to_body.setRPY(roll_cam, pitch_cam, yaw_cam);
+        // world-frame Z correction
         quat_rot_z.setRPY(0, 0, -gamma_world);
-        quat_body = quat_rot_z * quat_cam * quat_cam_to_body_x * quat_cam_to_body_y * quat_cam_to_body_z;
+        // final orientation of the body frame, expressed in <target_frame_id>
+        quat_body = quat_rot_z * quat_cam * quat_cam_to_body;
         quat_body.normalize();
 
         msg_body_pose.header.stamp = transform.header.stamp;

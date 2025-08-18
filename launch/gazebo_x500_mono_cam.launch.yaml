@@ -1,0 +1,18 @@
+%YAML 1.2
+---
+launch:
+    #  Include the existing Python launch file and pass all values
+    - include:
+          file: /home/developer/ros2_ws/src/vision_to_mavros/launch/vision_to_mavros.launch.py
+          arg:
+              - { name: "use_sim_time", value: "true" }
+              - { name: "target_frame_id", value: "base" }
+              - {
+                    name: "source_frame_id",
+                    value: "x500_mono_cam_0/mono_cam/base_link/imager",
+                }
+              - { name: "output_rate", value: "30.0" }
+              - { name: "roll_cam", value: "1.57" }
+              - { name: "pitch_cam", value: "-1.57" }
+              - { name: "yaw_cam", value: "0.0" }
+              - { name: "gamma_world", value: "1.57" }
